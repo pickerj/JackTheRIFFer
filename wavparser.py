@@ -12,6 +12,8 @@ class ParsedWave(object):
         Method Initialize
         :param filename:
         """
+        self.binary = None
+        self.filename = filename
         self.chunk_id = None
         self.chunk_size = None
         self.format = None
@@ -34,6 +36,8 @@ class ParsedWave(object):
 
 
     def parse_file(self, filename):
+        with open(filename,'rb') as wav:
+            self.binary = wav.read()
         with open(filename, 'rb') as wav:
             self.chunk_id = wav.read(4)
             self.chunk_size = struct.unpack('<I', wav.read(4))[0]
@@ -57,6 +61,35 @@ class ParsedWave(object):
 
             self.bytes_per_sample = self.bits_per_sample / 8
             self.length_in_seconds = len(self.samples) / (self.sample_rate * self.num_channels)
+
+
+    def write_to_file(self):
+        print("Writing file to {}.jack".format(self.filename))
+
+        # Reverse polarity
+        #for i in range(0,len(self.samples)):
+        #    if (self.samples[i] > 0):
+        #        self.samples[i] = (self.samples[i] - 10) * -1
+        #    else:
+        #        self.samples[i] = (self.samples[i] + 10) * -1
+
+        # Reverse audio
+        #self.samples = self.samples[::-1]
+
+        with open(self.filename + '.jack','wb') as wav:
+            # write first 44 bytes of header info
+            for i in range(0,44):
+                wav.write(self.binary[i])
+            
+            # write sample_count (* 2) bytes to file
+            for i in range(0,self.sample_count):
+                wav.write(struct.pack('<h',self.samples[i]))
+
+            binoffset = 44 + (self.sample_count * 2)
+
+            for i in range(binoffset,len(self.binary)):
+                wav.write(self.binary[i])
+
 
     def debug(self):
 
