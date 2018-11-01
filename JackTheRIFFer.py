@@ -31,6 +31,10 @@ def validate_args(args):
             print("Exiting...")
             exit(0)
 
+
+
+
+
 def main():
     #Use argparse to parse arguments
     parser = argparse.ArgumentParser(conflict_handler='resolve')
@@ -44,6 +48,25 @@ def main():
     # Validates Arguments
     validate_args(args)
 
+    # Calculate max filesize
+
+    # Encrypt file using <key>
+
+    # Validate encrypted filesize
+
+    # Write header:  bin(encrypted_byte_count * 8)[2:].zfill(header_size_in_bits)
+
+
+    # Create bytearray from encrypted file
+    # Assume x = encrypted file bytes
+    # Then,
+    #  binarydata = ''.join(bin(i)[2:].zfill(8) for i in bytearray(x))
+    # Now, for i in range(0,len(parsed.samples):
+    # if binarydata[i] == '0': parsed.samples[i] = parsed.samples[i] & 0xFFFE
+    # else: parsed.samples[i] = parsed.samples[i] | 0x1
+
+    # if i > len(binarydata)
+    # 
 
     # Exit
     exit(0)
