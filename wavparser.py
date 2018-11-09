@@ -1,6 +1,8 @@
 #/usr/bin/python
 
 import struct
+import math
+import utilities as ut
 
 class ParsedWave(object):
     """
@@ -63,10 +65,52 @@ class ParsedWave(object):
             self.length_in_seconds = len(self.samples) / (self.sample_rate * self.num_channels)
 
 
+    def encode_data(self,byte_array):
+        if type(byte_array) is not bytearray:
+            print("ERROR: encoded data must be a byte array")
+            return
+
+        bits = ''.join([bin(i)[2:].zfill(8) for i in byte_array])
+
+        # Calculate Header size
+        header_size = int(math.ceil(math.log(len(self.samples),2)))
+        #header_residue = header_size % 8
+        #if header_residue != 0:
+        #    header_residue = 8 - header_residue
+        #header_size += header_residue
+        max_len = len(self.samples) - header_size
+        bits_len = len(bits)
+
+        if bits_len > max_len:
+            print("ERROR: the data to be encoded is too large for the current sample space")
+            return
+
+        # Write len(bits) into header as binary string
+        header_bstring = bin(bits_len)[2:].zfill(header_size)
+        data_bstring = header_bstring + bits
+
+        # Write each bit into parsed samples LSB
+        for i in range(0,len(data_bstring)):
+            if data_bstring[i] == '0':
+                if self.samples[i] < 0:
+                    tmp = ut.twos_comp(self.samples[i],16)
+                    tmp &= 0xFFFE
+                    self.samples[i] = ut.twos_comp(tmp,16)
+                else:
+                    self.samples[i] &= 0xFFFE
+            else:
+                if self.samples[i] < 0:
+                    tmp = ut.twos_comp(self.samples[i],16)
+                    tmp |= 0x1
+                    self.samples[i] = ut.twos_comp(tmp,16)
+                else:
+                    self.samples[i] |= 1
+
+
     def write_to_file(self):
         print("Writing file to {}.jack".format(self.filename))
 
-        # Reverse polarity
+        # Invert polarity
         #for i in range(0,len(self.samples)):
         #    if (self.samples[i] > 0):
         #        self.samples[i] = (self.samples[i] - 10) * -1
