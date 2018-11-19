@@ -107,8 +107,11 @@ class ParsedWave(object):
                     self.samples[i] |= 1
 
 
-    def write_to_file(self):
-        print("Writing file to {}.jack".format(self.filename))
+    def write_to_file(self,outfile_name = None):
+        if not outfile_name:
+            outfile_name = self.filename + '.jack'
+
+        print("Writing file to {}.jack".format(outfile_name))
 
         # Invert polarity
         #for i in range(0,len(self.samples)):
@@ -120,7 +123,7 @@ class ParsedWave(object):
         # Reverse audio
         #self.samples = self.samples[::-1]
 
-        with open(self.filename + '.jack','wb') as wav:
+        with open(outfile_name,'wb') as wav:
             # write first 44 bytes of header info
             for i in range(0,44):
                 wav.write(self.binary[i])
