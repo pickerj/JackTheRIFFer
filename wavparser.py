@@ -111,7 +111,7 @@ class ParsedWave(object):
         if not outfile_name:
             outfile_name = self.filename + '.jack'
 
-        print("Writing file to {}.jack".format(outfile_name))
+        print("STATUS: Writing file to {}".format(outfile_name))
 
         # Invert polarity
         #for i in range(0,len(self.samples)):

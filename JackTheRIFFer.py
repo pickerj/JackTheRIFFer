@@ -1,11 +1,11 @@
 #!/usr/bin/python2.7
+# -*- coding: utf-8 -*-
 #Authors:           Jacob Mills, James Picker, Kira Lessin
 #Date:              10/23/2018
 #Description:       A Tool For Audio LSB Steganography Using AES Encryption
 #ChangeLog:                   
 #                   
 #                   
-#
 
 import argparse
 import wavparser
@@ -21,6 +21,15 @@ def usage():
     print("./JackTheRIFFER -d <key> -w <wave> -o <outfile>")
     print("\tdecrypt hidden data in <wave> using AES with <key> and store results in <outfile>\n")
 
+def splash():
+    print("""
+      _            _    _____ _          ____  ___ _____ _____         
+     | | __ _  ___| | _|_   _| |__   ___|  _ \|_ _|  ___|  ___|__ _ __ 
+  _  | |/ _` |/ __| |/ / | | | '_ \ / _ \ |_) || || |_  | |_ / _ \ '__|
+ | |_| | (_| | (__|   <  | | | | | |  __/  _ < | ||  _| |  _|  __/ |   
+  \___/ \__,_|\___|_|\_\ |_| |_| |_|\___|_| \_\___|_|   |_|  \___|_|   
+    """)
+
 def validate_args(args):
     if (not args.decrypt and not args.encrypt) or (args.decrypt and args.encrypt) or (not args.outfile) or (not args.wave) or (args.encrypt and not args.file):
         usage()
@@ -28,7 +37,7 @@ def validate_args(args):
     
     if os.path.isfile(args.outfile):
         response = raw_input("WARNING: " \
-                "existing files named {} will be overwritten\n\tContinue? (y/n) ".format(args.outfile))
+                "existing file named {} will be overwritten\n\tContinue? (y/n) ".format(args.outfile))
         if (response.lower() not in ["y","yes"]):
             print("Exiting...")
             exit(0)
@@ -48,6 +57,9 @@ def main():
     # Validates Arguments
     validate_args(args)
 
+    # Print splash
+    splash()
+
     # Load wave
     parsed_wave = wavparser.ParsedWave(args.wave)
     if parsed_wave.binary:
@@ -60,13 +72,13 @@ def main():
     if args.encrypt:
         encrypted_data = utilities.encrypt(args.file,args.encrypt)
         parsed_wave.encode_data(encrypted_data)
-        parsed_wave.write_to_file()
+        parsed_wave.write_to_file(args.outfile)
     else:
         pass
         #encrypted_data = parsed_wave.decode_data()
         #utilities.decrypt(encrypted_data,args.key,args.outfile)
 
-    print("Success! Output file {} has been produced".format(args.outfile))
+    print("STATUS: Success! Output file {} has been produced".format(args.outfile))
 
     # Exit
     exit(0)

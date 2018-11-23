@@ -33,13 +33,13 @@ def encrypt(filename, key):
  	if len(key) < 16:
  		pad = len(key)%16
  		pad = 16 - pad
- 		print"WARNING: The key length must be 16 bytes. Your key will be padded with "\
- 		+ str(pad) +" zeros"
+ 		print("WARNING: The key length must be 16 bytes - padding key with "\
+ 		+ str(pad) +" zeros")
  		for p in range(pad):
  			key += '0'	
  	elif len(key) > 16:	
 		print('ERROR: Key length must be 16 bytes')
-		exit()
+		exit(1)
 	
 	mode = AES.MODE_CBC
  	rand_num = Random.new()
