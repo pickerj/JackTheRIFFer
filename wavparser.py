@@ -107,6 +107,44 @@ class ParsedWave(object):
                     self.samples[i] |= 1
 
 
+    def decode_data(self):        
+        # Calculate header size
+        header_size = int(math.ceil(math.log(len(self.samples), 2)))
+        header_value = 0x0000
+        data_bstring = bytearray()
+        
+        # Read LSB from first header_size samples to get size parameter
+        for i in range(0, header_size):
+            tmp = self.samples[i]
+            if tmp < 0:
+                tmp = ut.twos_comp(self.samples[i], 16)
+            tmp = 0x0001 & self.samples[i]
+            header_value |= tmp
+            header_value = header_value << 1
+        
+        max_len = len(self.samples) - header_size
+        if header_value > max_len:
+            return None, 1
+        
+        # Read LSB from data section of encoded wave to extract data_bstring
+        bit_count = 0;
+        tmp_byte  = 0x00;
+        for i in range(header_size, header_size + header_value):
+            tmp = self.samples[i]
+            if tmp < 0:
+                tmp = ut.twos_comp(self.samples[i], 16)
+            tmp &= 0x0001
+            tmp_byte |= tmp
+            bit_count += 1
+            if bit_count == 8:
+                bit_count = 0
+                data_bstring.append(tmp_byte)
+                tmp_byte = 0x00
+            tmp_byte = tmp_byte << 1
+        
+        return data_bstring, 0
+
+
     def write_to_file(self,outfile_name = None):
         if not outfile_name:
             outfile_name = self.filename + '.jack'

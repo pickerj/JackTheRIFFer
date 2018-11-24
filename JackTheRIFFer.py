@@ -74,9 +74,11 @@ def main():
         parsed_wave.encode_data(encrypted_data)
         parsed_wave.write_to_file(args.outfile)
     else:
-        pass
-        #encrypted_data = parsed_wave.decode_data()
-        #utilities.decrypt(encrypted_data,args.key,args.outfile)
+        encrypted_data, error_found = parsed_wave.decode_data()
+        if error_found:
+            print("ERROR: Wave file does not appear to contain encoded data")
+            exit(1)
+        utilities.decrypt(encrypted_data,args.decrypt,args.outfile)
 
     print("STATUS: Success! Output file {} has been produced".format(args.outfile))
 
