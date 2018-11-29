@@ -77,7 +77,7 @@ class ParsedWave(object):
         #if header_residue != 0:
         #    header_residue = 8 - header_residue
         #header_size += header_residue
-        key_size = 16 # Maximum length of AES encryption padding
+        key_size = 128 # Maximum length of AES encryption padding
         max_len = len(self.samples) - header_size - key_size
         bits_len = len(bits)
 
