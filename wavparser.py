@@ -61,7 +61,6 @@ class ParsedWave(object):
             for _ in range(self.sample_count):
                 self.samples.append(struct.unpack('<h', wav.read(2))[0])
 
-            self.bytes_per_sample = self.bits_per_sample / 8
             self.length_in_seconds = len(self.samples) / (self.sample_rate * self.num_channels)
 
 
@@ -93,16 +92,16 @@ class ParsedWave(object):
         for i in range(0,len(data_bstring)):
             if data_bstring[i] == '0':
                 if self.samples[i] < 0:
-                    tmp = ut.twos_comp(self.samples[i],16)
+                    tmp = ut.twos_comp(self.samples[i],self.bits_per_sample)
                     tmp &= 0xFFFE
-                    self.samples[i] = ut.twos_comp(tmp,16)
+                    self.samples[i] = ut.twos_comp(tmp,self.bits_per_sample)
                 else:
                     self.samples[i] &= 0xFFFE
             else:
                 if self.samples[i] < 0:
-                    tmp = ut.twos_comp(self.samples[i],16)
+                    tmp = ut.twos_comp(self.samples[i],self.bits_per_sample)
                     tmp |= 0x1
-                    self.samples[i] = ut.twos_comp(tmp,16)
+                    self.samples[i] = ut.twos_comp(tmp,self.bits_per_sample)
                 else:
                     self.samples[i] |= 1
 
@@ -117,7 +116,7 @@ class ParsedWave(object):
         for i in range(0, header_size):
             tmp = self.samples[i]
             if tmp < 0:
-                tmp = ut.twos_comp(self.samples[i], 16)
+                tmp = ut.twos_comp(self.samples[i], self.bits_per_sample)
             tmp = 0x0001 & self.samples[i]
             header_value |= tmp
             header_value = header_value << 1
@@ -133,7 +132,7 @@ class ParsedWave(object):
         for i in range(header_size, header_size + header_value):
             tmp = self.samples[i]
             if tmp < 0:
-                tmp = ut.twos_comp(self.samples[i], 16)
+                tmp = ut.twos_comp(self.samples[i], self.bits_per_sample)
             tmp &= 0x0001
             tmp_byte |= tmp
             bit_count += 1
@@ -171,7 +170,7 @@ class ParsedWave(object):
             for i in range(0,self.sample_count):
                 wav.write(struct.pack('<h',self.samples[i]))
 
-            binoffset = 44 + (self.sample_count * 2)
+            binoffset = 44 + (self.sample_count * self.bytes_per_sample)
 
             for i in range(binoffset,len(self.binary)):
                 wav.write(self.binary[i])
