@@ -76,6 +76,14 @@ def encrypt(filename, key):
 
 def decrypt(ba, key, outfile, IV=0):    
     mode = AES.MODE_CBC
+    
+    if len(key) < 16:
+        pad = len(key)%16
+        pad = 16 - pad
+        print("WARNING: The key length must be 16 bytes - padding key with "\
+        + str(pad) +" zeros")
+        for p in range(pad):
+            key += '0'
 
     if IV == 0:
         IV = parse_IV(ba)
@@ -85,7 +93,8 @@ def decrypt(ba, key, outfile, IV=0):
     dec = AES.new(key, mode, IV=IV)
     plaintext=dec.decrypt(ciphertext)
     #EOF character marks padding
-    index = plaintext.find(chr(4))
+    index = len(plaintext) - plaintext[::-1].find(chr(4)) - 1
+
     #ignore appeneded padding and prepended IV
     output = plaintext[16:index]
     f = open(outfile, 'w')

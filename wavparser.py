@@ -121,11 +121,12 @@ class ParsedWave(object):
             tmp = 0x0001 & self.samples[i]
             header_value |= tmp
             header_value = header_value << 1
-        
+        header_value = header_value >> 1
+
         max_len = len(self.samples) - header_size
         if header_value > max_len:
             return None, 1
-        
+
         # Read LSB from data section of encoded wave to extract data_bstring
         bit_count = 0;
         tmp_byte  = 0x00;
@@ -141,7 +142,7 @@ class ParsedWave(object):
                 data_bstring.append(tmp_byte)
                 tmp_byte = 0x00
             tmp_byte = tmp_byte << 1
-        
+        tmp_byte = tmp_byte >> 1 
         return data_bstring, 0
 
 
