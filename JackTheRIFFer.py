@@ -51,7 +51,7 @@ def main():
     parser.add_argument('-f','--file',metavar='<file>',help='The <file> to encrypt')
     requiredNamed = parser.add_argument_group('required named arguments')
     requiredNamed.add_argument('-o','--outfile',metavar='<filename>',help='Writes output to <filename>')
-    requiredNamed.add_argument('-w','--wave',metavar='<wave>',help='The <wave> hide an encrypted <file> in using LSB steganography')
+    requiredNamed.add_argument('-w','--wave',metavar='<wave>',help='The <wave> to hide an encrypted <file> in using LSB steganography')
     args = parser.parse_args()
 
     # Validates Arguments
