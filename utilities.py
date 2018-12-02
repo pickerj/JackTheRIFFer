@@ -57,15 +57,15 @@ def encrypt(filename, key):
     if padding == 0:
         data += chr(4)
         for p in range(15):
-            data += chr(padding)
+            data += '0'
     elif padding == 1:
         data += chr(4)
         for p in range(14):
-            data += chr(padding)
+            data += '0'
     else:    
         data += chr(4)
         for p in range(16-(padding+1)):
-            data += chr(padding)
+            data += '0'
         
     #encrypt
     ciphertext = enc.encrypt(data)
