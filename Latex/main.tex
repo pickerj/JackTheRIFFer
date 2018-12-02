@@ -1,0 +1,33 @@
+\documentclass[sigchi, 11pt]{acmart}
+
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{graphicx}
+
+\graphicspath{ {./images/} }
+
+\newcommand{\ind}{\hpahntom{}\hspace{0.5cm}}
+
+\settopmatter{printacmref=false} % Removes citation information below abstract
+\renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
+\pagestyle{plain} % removes running headers
+
+\begin{document}
+\title{\textbf{Audio LSB Steganography Utilizing AES Encryption}}
+\author{
+	Jacob Mills \qquad Kira Lessin \qquad James Picker \\
+	Department of Computer Science, Florida State University \\
+	\{jjm15e,kjl13c,jwp14e\}@my.fsu.edu \\
+	https://github.com/h0r53/jacktheriffer
+	\vspace{.25cm}
+}
+
+\maketitle
+
+\input{body}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

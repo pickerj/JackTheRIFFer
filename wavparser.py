@@ -54,12 +54,24 @@ class ParsedWave(object):
             self.bits_per_sample = struct.unpack('<H', wav.read(2))[0]
             self.sub_chunk_2_id = wav.read(4)
             self.sub_chunk_2_size = struct.unpack('<I', wav.read(4))[0]
+            self.data_offset = 44
+            while self.sub_chunk_2_id != "data":
+                self.data_offset += 8 + self.sub_chunk_2_size
+                wav.read(self.sub_chunk_2_size)
+                self.sub_chunk_2_id = wav.read(4)
+                self.sub_chunk_2_size = struct.unpack('<I', wav.read(4))[0]
 
             self.bytes_per_sample = self.bits_per_sample / 8
             self.sample_count = int(self.sub_chunk_2_size / self.bytes_per_sample)
 
+
+            # use the appropriate format character for struct packing
+            ctype = 'h'
+            if self.bytes_per_sample == 4:
+                ctype = 'i'
+
             for _ in range(self.sample_count):
-                self.samples.append(struct.unpack('<h', wav.read(2))[0])
+                self.samples.append(struct.unpack('<' + ctype, wav.read(self.bytes_per_sample))[0])
 
             self.length_in_seconds = len(self.samples) / (self.sample_rate * self.num_channels)
 
@@ -163,15 +175,20 @@ class ParsedWave(object):
         #self.samples = self.samples[::-1]
 
         with open(outfile_name,'wb') as wav:
-            # write first 44 bytes of header info
-            for i in range(0,44):
+            # write bytes of header info until we reach the data offset
+            for i in range(0,self.data_offset):
                 wav.write(self.binary[i])
-            
+
+            # use the appropriate format character for struct packing
+            ctype = 'h'
+            if self.bytes_per_sample == 4:
+                ctype = 'i'
+
             # write sample_count (* 2) bytes to file
             for i in range(0,self.sample_count):
-                wav.write(struct.pack('<h',self.samples[i]))
+                wav.write(struct.pack('<' + ctype,self.samples[i]))
 
-            binoffset = 44 + (self.sample_count * self.bytes_per_sample)
+            binoffset = self.data_offset + (self.sample_count * self.bytes_per_sample)
 
             for i in range(binoffset,len(self.binary)):
                 wav.write(self.binary[i])
@@ -185,7 +202,7 @@ ChunkSize:\t{}
 Format:\t\t{}
 Subchunk1ID:\t{}
 Subchunk1Size:\t{}
-AudioFormat:\t{}
+AudioFormat:\t{} => {}
 NumChannels:\t{}
 SampleRate:\t{}
 ByteRate:\t{}
@@ -203,6 +220,7 @@ AudioLength:\t{} seconds
         self.sub_chunk_1_id,
         self.sub_chunk_1_size,
         self.audio_format,
+        self.get_audio_format(),
         self.num_channels,
         self.sample_rate,
         self.byte_rate,
@@ -213,4 +231,19 @@ AudioLength:\t{} seconds
         len(self.samples),
         self.bytes_per_sample,
         self.length_in_seconds))
+
+
+    def get_audio_format(self):
+        """
+
+        :return:
+        """
+        switch = {
+            0x0001: 'WAVE_FORMAT_PCM',
+            0x0003: 'WAVE_FORMAT_IEEE_FLOAT',
+            0x0006: 'WAVE_FORMAT_ALAW',
+            0x0007: 'WAVE_FORMAT_MULAW',
+            0xFFFE: 'WAVE_FORMAT_EXTENSIBLE'
+            }
+        return switch[self.audio_format]
 
