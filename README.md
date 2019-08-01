@@ -6,3 +6,5 @@
   \___/ \__,_|\___|_|\_\ |_| |_| |_|\___|_| \_\___|_|   |_|  \___|_|  
 ```  
 A Tool For Audio LSB Steganography Using AES Encryption
+
+Jacob Mills - Kira Lessin - James Picker
